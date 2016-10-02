@@ -17,15 +17,33 @@ Let's start with a trivial example:
         "github.com/donutloop/command-provider"
     )
 
-	buildCommand := func(text string) command_provider.CommandWrapper {
-		return command_provider.CommandWrapper{
-			Command: func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
-				return text, nil, nil
-			},
-		}
-	}
+    func main() {
 
-	commandProvider := command_provider.New(5, buildCommand("Hello World"), buildCommand("Hello World"), buildCommand("Hello World"))
+	    buildCommand := func(text string) command_provider.CommandWrapper {
+		    return command_provider.CommandWrapper{
+			    Command: func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
+				    return text, nil, nil
+			    },
+		    }
+	    }
 
-	data, warnings, errors := commandProvider.Execute()
+	    commandProvider := command_provider.New(5, buildCommand("Hello World"), buildCommand("Hello World"), buildCommand("Hello World"))
+
+	    data, warnings, errors := commandProvider.Execute()
+
+	    if len(errors) != 0 {
+	        //.........
+	    }
+
+        if len(warnings) != 0 {
+        	//........
+        }
+
+        for _, value := range data {
+              if text, ok := value.(string); !ok || text != "Hello World" {
+              		//......
+              }
+        }
+
+    }
 ```
