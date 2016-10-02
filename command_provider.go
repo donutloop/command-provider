@@ -16,23 +16,23 @@ type CommandWrapper struct {
 
 func New(timeForCommand time.Duration, commandWrapper ...CommandWrapper) CommandProvider {
 	return CommandProvider{
-		commandWrappers: append([]CommandWrapper{}, commandWrapper...),
+		CommandWrappers: append([]CommandWrapper{}, commandWrapper...),
 		TimeForCommand:  timeForCommand,
 	}
 }
 
 type CommandProvider struct {
-	commandWrappers []CommandWrapper
+	CommandWrappers []CommandWrapper
 	TimeForCommand  time.Duration
 }
 
 func (cp *CommandProvider) Execute() (data []interface{}, warnings []Warning, errs []error) {
 
-	dataChan := make(chan interface{}, len(cp.commandWrappers))
-	warChan := make(chan Warning, len(cp.commandWrappers))
+	dataChan := make(chan interface{}, len(cp.CommandWrappers))
+	warChan := make(chan Warning, len(cp.CommandWrappers))
 	errChan := make(chan error)
 
-	for _, commandWrapper := range cp.commandWrappers {
+	for _, commandWrapper := range cp.CommandWrappers {
 		go func(commandWrapper CommandWrapper) {
 			data, war, err := commandWrapper.Command(commandWrapper.Parameters)
 
@@ -50,7 +50,7 @@ func (cp *CommandProvider) Execute() (data []interface{}, warnings []Warning, er
 		}(commandWrapper)
 	}
 
-	for i := 0; i < len(cp.commandWrappers); i++ {
+	for i := 0; i < len(cp.CommandWrappers); i++ {
 		select {
 		case ReceivedData := <-dataChan:
 			data = append(data, ReceivedData)
@@ -68,4 +68,12 @@ func (cp *CommandProvider) Execute() (data []interface{}, warnings []Warning, er
 	errChan = nil
 
 	return
+}
+
+func (cp *CommandProvider) Clear() {
+	cp.CommandWrappers = []CommandWrapper{}
+}
+
+func (cp *CommandProvider) Add(commandWrappers ...CommandWrapper) {
+	cp.CommandWrappers = append(cp.CommandWrappers, commandWrappers...)
 }

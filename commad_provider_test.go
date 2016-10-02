@@ -62,7 +62,45 @@ func TestCommandProviderWithMultiCommandWarnings(t *testing.T) {
 
 	_, warnings, _ := commandProvider.Execute()
 
-	if len(warnings) != 2{
-		t.Errorf("Expected: 3 times test  got %v", warnings)
+	if len(warnings) != 2 {
+		t.Errorf("Expected: 2 times test  got %v", warnings)
+	}
+}
+
+func TestCommandProviderWithMultiCommandClear(t *testing.T) {
+
+	buildCommand := func(test string) command_provider.CommandWrapper {
+		return command_provider.CommandWrapper{
+			Command: func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
+				return test, nil, nil
+			},
+		}
+	}
+
+	commandProvider := command_provider.New(5, buildCommand("Hello World"), buildCommand("Hello World"), buildCommand("Hello World"))
+
+	commandProvider.Clear()
+
+	if len(commandProvider.CommandWrappers) != 0 {
+		t.Errorf("Expected: 0 commands  got %v", commandProvider.CommandWrappers)
+	}
+}
+
+func TestCommandProviderWithMultiCommandAdd(t *testing.T) {
+
+	buildCommand := func(test string) command_provider.CommandWrapper {
+		return command_provider.CommandWrapper{
+			Command: func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
+				return test, nil, nil
+			},
+		}
+	}
+
+	commandProvider := command_provider.New(5)
+
+	commandProvider.Add(buildCommand("Hello World"), buildCommand("Hello World"), buildCommand("Hello World"))
+
+	if len(commandProvider.CommandWrappers) != 3 {
+		t.Errorf("Expected: 3 commands  got %v", commandProvider.CommandWrappers)
 	}
 }
