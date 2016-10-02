@@ -2,6 +2,8 @@
 
 # Command provider
 
+CommandProvider is a lightweight high performance commander (using "concurrency" to execute a the commands) for Go.
+
 ## Usage
 
 This is just a quick introduction
