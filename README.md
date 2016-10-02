@@ -40,7 +40,7 @@ Let's start with a trivial example:
         }
 
         for _, value := range data {
-              if text, ok := value.(string); !ok || text != "Hello World" {
+              if text, ok := value.(string); ok && text == "Hello World" {
               		//......
               }
         }
