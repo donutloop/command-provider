@@ -1,15 +1,16 @@
 package command_provider_test
 
 import (
-	"testing"
+	"errors"
 	"github.com/donutloop/command-provider"
+	"testing"
 )
 
 func TestCommandProviderWithOneCommand(t *testing.T) {
 
-	buildCommand := func(test string) command_provider.CommandWrapper{
+	buildCommand := func(test string) command_provider.CommandWrapper {
 		return command_provider.CommandWrapper{
-			Command:func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
+			Command: func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
 				return test, nil, nil
 			},
 		}
@@ -28,9 +29,9 @@ func TestCommandProviderWithOneCommand(t *testing.T) {
 
 func TestCommandProviderWithMultiCommand(t *testing.T) {
 
-	buildCommand := func(test string) command_provider.CommandWrapper{
+	buildCommand := func(test string) command_provider.CommandWrapper {
 		return command_provider.CommandWrapper{
-			Command:func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
+			Command: func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
 				return test, nil, nil
 			},
 		}
@@ -44,5 +45,30 @@ func TestCommandProviderWithMultiCommand(t *testing.T) {
 		if text, ok := value.(string); !ok || text != "Hello World" {
 			t.Errorf("Expected: \" Hello World\" got %v", text)
 		}
+	}
+}
+
+func TestCommandProviderWithMultiCommandWarnings(t *testing.T) {
+
+	buildCommand := func(test string) command_provider.CommandWrapper {
+		return command_provider.CommandWrapper{
+			Command: func(parameters command_provider.Parameters) (interface{}, command_provider.Warning, error) {
+				return test, command_provider.Warning(errors.New("test")), nil
+			},
+		}
+	}
+
+	commandProvider := command_provider.New(10, buildCommand("Hello World"), buildCommand("Hello World"))
+
+	data, warnings, _ := commandProvider.Execute()
+
+	for _, value := range data {
+		if text, ok := value.(string); !ok || text != "Hello World" {
+			t.Errorf("Expected: \" Hello World\" got %v", text)
+		}
+	}
+
+	if len(warnings) != 2{
+		t.Errorf("Expected: 3 times test  got %v", warnings)
 	}
 }
