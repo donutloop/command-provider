@@ -60,13 +60,7 @@ func TestCommandProviderWithMultiCommandWarnings(t *testing.T) {
 
 	commandProvider := command_provider.New(10, buildCommand("Hello World"), buildCommand("Hello World"))
 
-	data, warnings, _ := commandProvider.Execute()
-
-	for _, value := range data {
-		if text, ok := value.(string); !ok || text != "Hello World" {
-			t.Errorf("Expected: \" Hello World\" got %v", text)
-		}
-	}
+	_, warnings, _ := commandProvider.Execute()
 
 	if len(warnings) != 2{
 		t.Errorf("Expected: 3 times test  got %v", warnings)
